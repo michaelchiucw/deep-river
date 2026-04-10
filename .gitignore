@@ -289,3 +289,5 @@ cython_debug/
 !/build/
 /IncrementalTorch.egg-info/
 docs/benchmarks/index.md
+docs/reference/**
+!docs/reference/index.md

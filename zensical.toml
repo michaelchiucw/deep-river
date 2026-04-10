@@ -1,0 +1,93 @@
+[project]
+site_name = "deep-river"
+site_description = "deep-river is a Python library for incremental deep learning and serves as extension for river."
+site_author = "Cedric Kulbach"
+site_url = "https://online-ml.github.io/deep-river/"
+repo_name = "online-ml/deep-river"
+repo_url = "https://github.com/online-ml/deep-river"
+edit_uri = "edit/master/docs/"
+copyright = "Copyright &copy; 2019 - 2025 Deep River Contributors"
+docs_dir = "docs"
+site_dir = "site"
+extra_javascript = [
+  "https://polyfill.io/v3/polyfill.min.js?features=es6",
+  "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js",
+]
+
+[project.markdown_extensions.abbr]
+[project.markdown_extensions.admonition]
+[project.markdown_extensions.attr_list]
+[project.markdown_extensions.def_list]
+[project.markdown_extensions.footnotes]
+[project.markdown_extensions.md_in_html]
+[project.markdown_extensions.toc]
+permalink = true
+title = "Page contents"
+toc_depth = "2-3"
+
+[project.markdown_extensions.pymdownx.arithmatex]
+generic = true
+
+[project.markdown_extensions.pymdownx.betterem]
+smart_enable = "all"
+
+[project.markdown_extensions.pymdownx.caret]
+[project.markdown_extensions.pymdownx.details]
+
+[project.markdown_extensions.pymdownx.emoji]
+emoji_generator = "zensical.extensions.emoji.to_svg"
+emoji_index = "zensical.extensions.emoji.twemoji"
+
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+line_spans = "__span"
+pygments_lang_class = true
+
+[project.markdown_extensions.pymdownx.inlinehilite]
+[project.markdown_extensions.pymdownx.keys]
+[project.markdown_extensions.pymdownx.mark]
+[project.markdown_extensions.pymdownx.smartsymbols]
+
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+
+[project.markdown_extensions.pymdownx.tabbed]
+alternate_style = true
+
+[project.markdown_extensions.pymdownx.tasklist]
+custom_checkbox = true
+
+[project.markdown_extensions.pymdownx.tilde]
+
+[project.plugins.mkdocstrings.handlers.python]
+paths = ["deep_river"]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "numpy"
+docstring_section_style = "table"
+heading_level = 1
+inherited_members = true
+merge_init_into_class = true
+separate_signature = true
+show_root_heading = true
+show_root_full_path = false
+show_signature_annotations = true
+show_symbol_type_heading = true
+show_symbol_type_toc = true
+signature_crossrefs = true
+summary = true
+filters = ["!^_"]
+
+[project.plugins."mkdocs-jupyter"]
+execute = false
+include = ["**/*.ipynb"]
+ignore = [
+  "**/.ipynb_checkpoints/*",
+  ".ipynb_checkpoints/*",
+  "**/*-checkpoint.ipynb",
+]
+ignore_h1_titles = true
+include_source = true
+theme = "auto"

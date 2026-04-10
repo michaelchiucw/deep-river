@@ -1,3 +1,5 @@
+# Benchmarks
+
 ## Binary classification
 
 
@@ -721,4 +723,3 @@ Processor   : i386
 CPU cores   : 16
 Architecture: 64bit
 </pre>
-

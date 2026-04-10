@@ -18,10 +18,13 @@ execute-notebooks: check-uv
 
 doc: check-uv
 	(cd benchmarks && uv run python render.py)
-	uv run mkdocs build
+	uv run python docs/scripts/gen_ref_pages.py
+	uv run zensical build --clean
 
-livedoc: doc
-	uv run mkdocs serve --dirtyreload
+livedoc: check-uv
+	(cd benchmarks && uv run python render.py)
+	uv run python docs/scripts/gen_ref_pages.py
+	uv run zensical serve
 
 rebase:
 	git fetch && git rebase origin/master
