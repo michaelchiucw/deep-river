@@ -288,6 +288,9 @@ cython_debug/
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,pycharm,jupyternotebooks,python
 !/build/
 /IncrementalTorch.egg-info/
-docs/benchmarks/index.md
+docs/benchmarks/*/
+docs/examples/index.md
+docs/examples/*/index.md
 docs/reference/**
 !docs/reference/index.md
+docs/generated/**

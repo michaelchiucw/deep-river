@@ -9,9 +9,17 @@ edit_uri = "edit/master/docs/"
 copyright = "Copyright &copy; 2019 - 2025 Deep River Contributors"
 docs_dir = "docs"
 site_dir = "site"
+extra_css = [
+  "stylesheets/notebook-output.css",
+]
 extra_javascript = [
   "https://polyfill.io/v3/polyfill.min.js?features=es6",
   "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js",
+]
+
+[project.theme]
+features = [
+  "navigation.indexes",
 ]
 
 [project.markdown_extensions.abbr]
@@ -79,15 +87,3 @@ show_symbol_type_toc = true
 signature_crossrefs = true
 summary = true
 filters = ["!^_"]
-
-[project.plugins."mkdocs-jupyter"]
-execute = false
-include = ["**/*.ipynb"]
-ignore = [
-  "**/.ipynb_checkpoints/*",
-  ".ipynb_checkpoints/*",
-  "**/*-checkpoint.ipynb",
-]
-ignore_h1_titles = true
-include_source = true
-theme = "auto"

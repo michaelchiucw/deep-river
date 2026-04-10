@@ -64,7 +64,6 @@ dev = [
     "jupyter-contrib-nbextensions>=0.7.0",
     "jupyter-client>=7.0.0",
     "matplotlib>=3.9.2",
-    "mkdocs-jupyter>=0.25.1",
     "mkdocstrings-python>=1.18.2",
     "mypy>=1.17.0",
     "nbconvert>=7.0.0",
