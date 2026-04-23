@@ -116,13 +116,23 @@ def write_category_index(category: str, pages: list[NotebookPage]) -> None:
 
 def write_examples_index(categories: list[str]) -> None:
     index_path = EXAMPLES_DIR / "index.md"
+    preferred_order = [
+        "classification",
+        "regression",
+        "anomaly",
+        "catastrophic_forgetting",
+        "model_persistence",
+    ]
+    known = [category for category in preferred_order if category in categories]
+    unknown = sorted(category for category in categories if category not in preferred_order)
+    ordered_categories = [*known, *unknown]
     links = [
         f"- [{category_label(category)}]({category}/index.md)"
-        for category in categories
+        for category in ordered_categories
     ]
     intro = (
-        "A curated set of notebooks covering classification, regression, anomaly detection, "
-        "catastrophic forgetting, and model persistence workflows."
+        "Explore runnable notebooks that demonstrate how deep-river behaves in real streaming settings. "
+        "The collection is organized from foundational tasks to advanced continual learning topics."
     )
     content = "\n".join(["# Examples", "", intro, "", *links, ""])
     index_path.write_text(content, encoding="utf-8")

@@ -10,6 +10,7 @@ copyright = "Copyright &copy; 2019 - 2025 Deep River Contributors"
 docs_dir = "docs"
 site_dir = "site"
 extra_css = [
+  "stylesheets/landing.css",
   "stylesheets/notebook-output.css",
 ]
 extra_javascript = [

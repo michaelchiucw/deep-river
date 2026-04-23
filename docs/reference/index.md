@@ -1,3 +1,5 @@
 # API Reference
 
-Browse the generated API docs for deep-river modules, organized by task type and utilities, with full class and function signatures pulled from the source code.
+Use this section when you need implementation-level details: constructor parameters, method signatures, inheritance, and module-level utilities.
+
+Start with the task-specific modules (`classification`, `regression`, and `anomaly`) and then move to shared foundations in `base` and utility helpers.

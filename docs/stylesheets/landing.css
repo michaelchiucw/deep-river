@@ -1,0 +1,78 @@
+.landing-hero {
+  position: relative;
+  overflow: hidden;
+  margin: 1.2rem 0 2rem;
+  padding: 1.4rem 1.2rem;
+  border: 1px solid #d5dfdf;
+  border-radius: 0.9rem;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0) 34%),
+    linear-gradient(132deg, #edf8f3 0%, #f1f8ff 55%, #fff8ee 100%);
+  box-shadow: 0 10px 30px rgba(18, 54, 74, 0.08);
+}
+
+.landing-eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2b6660;
+}
+
+.landing-lead {
+  max-width: 46rem;
+  margin: 0.55rem 0 0;
+  font-size: 1.06rem;
+  line-height: 1.7;
+}
+
+.landing-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+a.landing-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.2rem;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid #1c7567;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  color: #1b534c;
+  background: rgba(255, 255, 255, 0.7);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+a.landing-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(24, 77, 67, 0.14);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+a.landing-cta-primary {
+  color: #ffffff;
+  background: linear-gradient(120deg, #1d6d62, #247a91);
+  border-color: #1d6d62;
+}
+
+a.landing-cta-primary:hover {
+  color: #ffffff;
+  background: linear-gradient(120deg, #1a6258, #216f84);
+}
+
+@media (max-width: 700px) {
+  .landing-hero {
+    padding: 1rem;
+  }
+
+  .landing-lead {
+    font-size: 0.98rem;
+    line-height: 1.62;
+  }
+}
