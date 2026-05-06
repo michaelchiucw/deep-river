@@ -57,7 +57,7 @@ jobs:
             echo "version=dev" >> "$GITHUB_OUTPUT"
             echo "title=dev" >> "$GITHUB_OUTPUT"
             echo "alias=" >> "$GITHUB_OUTPUT"
-            echo "default=" >> "$GITHUB_OUTPUT"
+            echo "default=dev" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Prepare gh-pages worktree
