@@ -100,14 +100,13 @@ model = Regressor(module=MyModule)
 
 If you're adding a class or a function, then you'll need to add a docstring. We follow the [Google docstring convention](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html), so please do too.
 
-To build the documentation, you need to install some extra dependencies:
+To build the documentation, install the development dependencies:
 
 ```sh
-poetry install --with docs
-pip install git+https://github.com/MaxHalford/yamp
+uv sync --extra dev
 ```
 
-From the root of the repository, you can then run the `make livedoc` command to take a look at the documentation in your browser. This will run a custom script which parses all the docstrings and generate MarkDown files that [MkDocs](https://www.mkdocs.org/) can render.
+From the root of the repository, you can then run the `make livedoc` command to take a look at the documentation in your browser. This will run the benchmark renderer and API reference generator before starting the Zensical preview server.
 
 ## Build Cython and Rust extensions
 
@@ -156,10 +155,9 @@ make execute-notebooks
 3. Run the [benchmarks](benchmarks)
 4. Bump the version in `deep_river/__version__.py`
 5. Bump the version in `pyproject.toml`
-6. Tag and date the `docs/releases/unreleased.md` file
-7. Commit and push
-8. Wait for CI to [run the unit tests](https://github.com/online-ml/deep-river/actions/workflows/ci.yml)
-9. Push the tag:
+6. Commit and push
+7. Wait for CI to [run the unit tests](https://github.com/online-ml/deep-river/actions/workflows/ci.yml)
+8. Push the release tag:
 
 ```sh
 DEEP_RIVER_VERSION=$(python -c "import deep_river; print(deep_river.__version__)")
@@ -167,8 +165,19 @@ echo $DEEP_RIVER_VERSION
 ```
 
 ```sh
-git tag $DEEP_RIVER_VERSION
-git push origin $DEEP_RIVER_VERSION
+git tag "v$DEEP_RIVER_VERSION"
+git push origin "v$DEEP_RIVER_VERSION"
 ```
 
-9. Wait for CI to [ship to PyPI](https://github.com/online-ml/deep-river/actions/workflows/pypi.yml) and [publish the new docs](https://github.com/online-ml/deep-river/actions/workflows/release-docs.yml)
+9. Wait for CI to [ship to PyPI](https://github.com/online-ml/deep-river/actions/workflows/pypi-publish.yml) and [publish the new docs](https://github.com/online-ml/deep-river/actions/workflows/docs.yml)
+
+## Versioned docs
+
+The documentation site publishes one entry per git tag and keeps `dev` up to date from `master`.
+
+- Tagged releases are published under the exact tag name, for example `v0.3.2`.
+- The newest stable release is also copied to the `latest` alias.
+- The site root redirects to `latest`.
+- `dev` is rebuilt from `master` on every docs deployment.
+
+If you need to rebuild all historical documentation versions, run the manual [Backfill Documentation Versions](https://github.com/online-ml/deep-river/actions/workflows/docs-backfill.yml) workflow.

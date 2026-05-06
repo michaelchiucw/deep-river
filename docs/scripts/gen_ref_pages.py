@@ -2,46 +2,43 @@
 
 from pathlib import Path
 
-import mkdocs_gen_files
+MODULE_ROOT = Path("deep_river")
+REFERENCE_ROOT = Path("docs/reference")
 
-nav = mkdocs_gen_files.Nav()
 
-for path in sorted(Path("deep_river").rglob("*.py")):
-    module_path = path.relative_to("deep_river").with_suffix("")
-    parts = list(module_path.parts)
+def iter_reference_targets():
+    for path in sorted(MODULE_ROOT.rglob("*.py")):
+        module_path = path.relative_to(MODULE_ROOT).with_suffix("")
+        parts = list(module_path.parts)
 
-    # Skip dunder and special modules
-    if parts[-1] in {"__init__", "__version__", "__main__", " "}:
-        continue
-
-    # Default doc path (mirrors package structure)
-    doc_path = path.relative_to("deep_river").with_suffix(".md")
-    full_doc_path = Path("reference", doc_path)
-    nav_key_parts = parts[:]  # copy for potential modification
-
-    # Handle utils filtering
-    if parts[0] == "utils":
-        allowed_utils = {"tensor_conversion", "params"}
-        if len(parts) >= 2 and parts[1] in allowed_utils:
-            # Flatten: expose as top-level pages (no utils section)
-            top_name = parts[1]
-            nav_key_parts = [top_name]
-            doc_path = Path(f"{top_name}.md")
-            full_doc_path = Path("reference", doc_path)
-        else:
-            # Skip any other utils module
-            continue
-        # Skip deeper nesting even for allowed modules (not currently used)
-        if len(parts) > 2:
+        if parts[-1] in {"__init__", "__version__", "__main__", " "}:
             continue
 
-    nav[nav_key_parts] = doc_path.as_posix()
+        doc_path = Path(*parts).with_suffix(".md")
 
-    with mkdocs_gen_files.open(full_doc_path, "w+") as fd:
+        if parts[0] == "utils":
+            allowed_utils = {"tensor_conversion", "params"}
+            if len(parts) >= 2 and parts[1] in allowed_utils:
+                doc_path = Path(f"{parts[1]}.md")
+            else:
+                continue
+            if len(parts) > 2:
+                continue
+
+        yield path, parts, doc_path
+
+
+def main() -> None:
+    REFERENCE_ROOT.mkdir(parents=True, exist_ok=True)
+
+    for path, parts, doc_path in iter_reference_targets():
+        full_doc_path = REFERENCE_ROOT / doc_path
+        full_doc_path.parent.mkdir(parents=True, exist_ok=True)
+
         identifier = ".".join(parts)
-        print(f"::: deep_river.{identifier}", file=fd)
+        content = f"::: deep_river.{identifier}\n"
+        full_doc_path.write_text(content, encoding="utf-8")
 
-    mkdocs_gen_files.set_edit_path(full_doc_path, path)
 
-with mkdocs_gen_files.open("reference/SUMMARY.md", "w+") as nav_file:
-    nav_file.writelines(nav.build_literate_nav())
+if __name__ == "__main__":
+    main()
