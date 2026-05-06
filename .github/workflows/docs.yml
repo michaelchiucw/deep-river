@@ -1,12 +1,21 @@
 name: Documentation Site
+
 on:
   push:
     branches:
       - master
+    tags:
+      - "v*"
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
+
 jobs:
   deploy:
     environment:
@@ -15,7 +24,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/configure-pages@v5
+
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install Ubuntu dependencies
         run: sudo apt-get install graphviz pandoc
@@ -40,24 +52,83 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
-      - name: Generate benchmarks
+      - name: Determine docs target
+        id: target
         run: |
-          cd benchmarks
-          uv run python render.py
-          cd ..
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            echo "title=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            echo "alias=latest" >> "$GITHUB_OUTPUT"
+            echo "default=latest" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=dev" >> "$GITHUB_OUTPUT"
+            echo "title=dev" >> "$GITHUB_OUTPUT"
+            echo "alias=" >> "$GITHUB_OUTPUT"
+            echo "default=" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Convert notebooks
-        run: uv run python docs/scripts/convert_notebooks.py
+      - name: Prepare gh-pages worktree
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch origin gh-pages --depth=1
+            git worktree add --force -B gh-pages .publish-site origin/gh-pages
+          else
+            origin_url=$(git remote get-url origin)
+            mkdir .publish-site
+            git init .publish-site
+            git -C .publish-site remote add origin "$origin_url"
+            git -C .publish-site checkout --orphan gh-pages
+          fi
 
-      - name: Generate API reference
-        run: uv run python docs/scripts/gen_ref_pages.py
+      - name: Configure gh-pages author
+        run: |
+          git -C .publish-site config user.name "github-actions[bot]"
+          git -C .publish-site config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Build docs
-        run: uv run zensical build --clean
+        env:
+          MIKE_DOCS_VERSION: ${{ steps.target.outputs.version }}
+        run: bash docs/scripts/build_docs.sh
+
+      - name: Publish versioned site
+        run: |
+          args=(
+            --source-dir site
+            --target-dir .publish-site
+            --version "${{ steps.target.outputs.version }}"
+            --title "${{ steps.target.outputs.title }}"
+          )
+
+          if [[ -n "${{ steps.target.outputs.alias }}" ]]; then
+            args+=(--alias "${{ steps.target.outputs.alias }}")
+          fi
+          if [[ -n "${{ steps.target.outputs.default }}" ]]; then
+            args+=(--default "${{ steps.target.outputs.default }}")
+          fi
+
+          uv run python docs/scripts/publish_versioned_site.py "${args[@]}"
+
+      - name: Commit gh-pages update
+        run: |
+          git -C .publish-site add -A
+          if git -C .publish-site diff --cached --quiet; then
+            echo "No documentation changes to publish."
+            exit 0
+          fi
+
+          git -C .publish-site commit -m "docs: publish ${{ steps.target.outputs.version }}"
+          git -C .publish-site push origin gh-pages
+
+      - name: Prepare Pages artifact
+        run: |
+          rm -rf .pages-site
+          mkdir -p .pages-site
+          cp -R .publish-site/. .pages-site/
+          rm -rf .pages-site/.git
 
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: site
+          path: .pages-site
 
       - uses: actions/deploy-pages@v4
         id: deployment

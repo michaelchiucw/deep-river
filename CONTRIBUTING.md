@@ -155,10 +155,9 @@ make execute-notebooks
 3. Run the [benchmarks](benchmarks)
 4. Bump the version in `deep_river/__version__.py`
 5. Bump the version in `pyproject.toml`
-6. Tag and date the `docs/releases/unreleased.md` file
-7. Commit and push
-8. Wait for CI to [run the unit tests](https://github.com/online-ml/deep-river/actions/workflows/ci.yml)
-9. Push the tag:
+6. Commit and push
+7. Wait for CI to [run the unit tests](https://github.com/online-ml/deep-river/actions/workflows/ci.yml)
+8. Push the release tag:
 
 ```sh
 DEEP_RIVER_VERSION=$(python -c "import deep_river; print(deep_river.__version__)")
@@ -166,8 +165,19 @@ echo $DEEP_RIVER_VERSION
 ```
 
 ```sh
-git tag $DEEP_RIVER_VERSION
-git push origin $DEEP_RIVER_VERSION
+git tag "v$DEEP_RIVER_VERSION"
+git push origin "v$DEEP_RIVER_VERSION"
 ```
 
-9. Wait for CI to [ship to PyPI](https://github.com/online-ml/deep-river/actions/workflows/pypi.yml) and [publish the new docs](https://github.com/online-ml/deep-river/actions/workflows/release-docs.yml)
+9. Wait for CI to [ship to PyPI](https://github.com/online-ml/deep-river/actions/workflows/pypi-publish.yml) and [publish the new docs](https://github.com/online-ml/deep-river/actions/workflows/docs.yml)
+
+## Versioned docs
+
+The documentation site publishes one entry per git tag and keeps `dev` up to date from `master`.
+
+- Tagged releases are published under the exact tag name, for example `v0.3.2`.
+- The newest stable release is also copied to the `latest` alias.
+- The site root redirects to `latest`.
+- `dev` is rebuilt from `master` on every docs deployment.
+
+If you need to rebuild all historical documentation versions, run the manual [Backfill Documentation Versions](https://github.com/online-ml/deep-river/actions/workflows/docs-backfill.yml) workflow.

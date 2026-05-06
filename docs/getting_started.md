@@ -5,6 +5,9 @@ This guide shows the fastest path from install to a working online deep learning
 deep-river follows the [river](https://www.riverml.xyz) streaming API while letting you use
 PyTorch modules for representation learning.
 
+The core workflow is a stream loop: make a prediction for the next item, update a metric,
+and then call `learn_one` so the model adapts before the next item arrives.
+
 ## Install
 
 ```bash
@@ -24,6 +27,9 @@ pip install https://github.com/online-ml/deep-river/archive/refs/heads/master.zi
 ```
 
 ## Build your first online classifier
+
+The example below defines a small PyTorch module, wraps it in a deep-river `Classifier`,
+and evaluates it online on river's phishing dataset.
 
 ```python
 import random

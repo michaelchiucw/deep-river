@@ -1,50 +1,64 @@
-# Online deep learning for data streams
+---
+title: deep-river
+---
 
-<div class="landing-hero">
-  <p class="landing-eyebrow">deep-river + river + PyTorch</p>
-  <p class="landing-lead">
-    deep-river is a research-oriented library for incremental deep learning. It combines river's
-    streaming machine learning API with PyTorch modules to support reproducible experimentation,
-    continual model updates, and evaluation under non-stationary data streams.
-  </p>
-  <div class="landing-cta-row">
-    <a class="landing-cta landing-cta-primary" href="getting_started/">Read getting started</a>
-    <a class="landing-cta" href="examples/">Review notebooks</a>
-    <a class="landing-cta" href="reference/">Read API docs</a>
+# Online deep learning with PyTorch and river
+
+<section class="landing-hero">
+  <div class="landing-hero-content">
+    <img class="landing-logo" src="img/logo.png" alt="deep-river">
+    <p class="landing-eyebrow">deep-river</p>
+    <p class="landing-lead">
+      Train PyTorch models incrementally on data streams with river's familiar
+      <code>predict_one</code>, <code>learn_one</code>, metrics, and pipeline APIs.
+    </p>
+    <div class="landing-cta-row">
+      <a class="landing-cta landing-cta-primary" href="getting_started/">Get started</a>
+      <a class="landing-cta" href="examples/">Examples</a>
+      <a class="landing-cta" href="reference/">API reference</a>
+      <a class="landing-cta" href="https://github.com/online-ml/deep-river">GitHub</a>
+    </div>
   </div>
-</div>
+</section>
 
-## Install
+<section class="landing-grid landing-intro-grid">
+  <div class="landing-panel">
+    <h2>Install</h2>
+    <pre><code>pip install deep-river</code></pre>
+    <p>or install through river extras:</p>
+    <pre><code>pip install "river[deep]"</code></pre>
+  </div>
+  <div class="landing-panel landing-code-panel">
+    <h2>Streaming model loop</h2>
+    <pre><code>metric = metrics.Accuracy()
 
-```bash
-pip install deep-river
-```
-
-or install through river extras:
-
-```bash
-pip install "river[deep]"
-```
+for x, y in stream:
+    y_pred = model.predict_one(x)
+    metric.update(y, y_pred)
+    model.learn_one(x, y)</code></pre>
+  </div>
+</section>
 
 ## Why deep-river
 
-- **Online training:** Update your model incrementally with `learn_one` and `learn_many`.
-- **PyTorch flexibility:** Use custom modules, losses, and optimizers.
-- **river compatibility:** Compose with preprocessing, metrics, and pipelines from river.
+<div class="landing-card-grid">
+  <div class="landing-card">
+    <h3>Online updates</h3>
+    <p>Learn from one sample or mini-batch at a time with stream-first estimators.</p>
+  </div>
+  <div class="landing-card">
+    <h3>PyTorch modules</h3>
+    <p>Bring your own architectures, losses, optimizers, and representation learning setup.</p>
+  </div>
+  <div class="landing-card">
+    <h3>river ecosystem</h3>
+    <p>Compose with river preprocessing, datasets, metrics, and pipelines.</p>
+  </div>
+</div>
 
-## Suggested reading path
+## Start here
 
-1. Install the package with `pip`.
-2. Follow [Getting started](getting_started.md) to build a baseline online classifier.
-3. Use [Examples](examples/index.md) to reproduce end-to-end task workflows.
-4. Inspect [Benchmarks](benchmarks/index.md) to compare model behavior across datasets.
-5. Consult [API Reference](reference/index.md) for estimator details and parameter semantics.
-
-## Explore
-
-- [Getting started](getting_started.md)
-- [Examples](examples/index.md)
-- [Benchmarks](benchmarks/index.md)
-- [API Reference](reference/index.md)
-- [GitHub](https://github.com/online-ml/deep-river)
-- [PyPI](https://pypi.org/project/deep-river/)
+- [Getting started](getting_started.md): build and evaluate your first online classifier.
+- [Examples](examples/index.md): run complete workflows for classification, regression, anomaly detection, and continual learning.
+- [API Reference](reference/index.md): inspect estimator parameters, methods, and module-level utilities.
+- [Benchmarks](benchmarks/index.md): compare model behavior across standard streaming datasets.
