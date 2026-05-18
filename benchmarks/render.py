@@ -15,27 +15,51 @@ from watermark import watermark
 
 # Professional color palette for models (Material Design inspired)
 COLOR_PALETTE = [
-    "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2",
-    "#7f7f7f", "#bcbd22", "#17becf", "#aec7e8", "#ffbb78", "#98df8a", "#ff9896",
-    "#c5b0d5", "#c49c94", "#f7b6d2", "#c7c7c7", "#dbdb8d", "#9edae5",
+    "#1f77b4",
+    "#ff7f0e",
+    "#2ca02c",
+    "#d62728",
+    "#9467bd",
+    "#8c564b",
+    "#e377c2",
+    "#7f7f7f",
+    "#bcbd22",
+    "#17becf",
+    "#aec7e8",
+    "#ffbb78",
+    "#98df8a",
+    "#ff9896",
+    "#c5b0d5",
+    "#c49c94",
+    "#f7b6d2",
+    "#c7c7c7",
+    "#dbdb8d",
+    "#9edae5",
 ]
 
 
-def render_df(dataset_df: pd.DataFrame, measures: List[str], models: List[str],
-              dataset: str, include_plotlyjs: bool = True) -> str:
+def render_df(
+    dataset_df: pd.DataFrame,
+    measures: List[str],
+    models: List[str],
+    dataset: str,
+    include_plotlyjs: bool = True,
+) -> str:
     nrows = max(1, len(measures))
     fig = make_subplots(
         rows=nrows,
         cols=1,
-        subplot_titles=[m.replace("_", " ").title() for m in
-                        measures] if measures else None,
+        subplot_titles=[m.replace("_", " ").title() for m in measures]
+        if measures
+        else None,
         shared_xaxes=True,
         vertical_spacing=0.06,
     )
 
     # Assign colors to models based on their index
-    model_colors = {model: COLOR_PALETTE[i % len(COLOR_PALETTE)] for i, model in
-                    enumerate(models)}
+    model_colors = {
+        model: COLOR_PALETTE[i % len(COLOR_PALETTE)] for i, model in enumerate(models)
+    }
 
     for model in models:
         model_df = dataset_df[dataset_df["model"] == model]
@@ -81,7 +105,8 @@ def render_df(dataset_df: pd.DataFrame, measures: List[str], models: List[str],
         font=dict(
             family="Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
             size=12,
-            color="#424242"),
+            color="#424242",
+        ),
         legend=dict(
             orientation="h",
             yanchor="top",
@@ -96,8 +121,9 @@ def render_df(dataset_df: pd.DataFrame, measures: List[str], models: List[str],
     if measures:
         fig.update_xaxes(title_text="Instance", row=nrows, col=1)
         for i, measure in enumerate(measures):
-            fig.update_yaxes(title_text=measure.replace("_", " ").title(),
-                             row=i + 1, col=1)
+            fig.update_yaxes(
+                title_text=measure.replace("_", " ").title(), row=i + 1, col=1
+            )
     else:
         fig.add_annotation(
             text="No numeric metrics found in CSV.",
@@ -116,8 +142,7 @@ def render_df(dataset_df: pd.DataFrame, measures: List[str], models: List[str],
         "responsive": True,
         "displayModeBar": True,
         "displaylogo": False,
-        "modeBarButtonsToRemove": ["pan2d", "lasso2d", "select2d",
-                                   "autoScale2d"],
+        "modeBarButtonsToRemove": ["pan2d", "lasso2d", "select2d", "autoScale2d"],
         "toImageButtonOptions": {
             "format": "png",
             "filename": f"{dataset_slug}_benchmark",
@@ -138,8 +163,7 @@ def render_df(dataset_df: pd.DataFrame, measures: List[str], models: List[str],
         validate=False,
     )
 
-    return (
-        f"""<div class=\"benchmark-plot\" id=\"{fig_div_id}-container\">\n  {html}\n</div>\n""")
+    return f"""<div class=\"benchmark-plot\" id=\"{fig_div_id}-container\">\n  {html}\n</div>\n"""
 
 
 if __name__ == "__main__":
@@ -147,23 +171,29 @@ if __name__ == "__main__":
         details = json.load(f)
 
     for track_name, track_details in details.items():
-        track_dir = Path(f"../docs/benchmarks/{track_name}")
-        track_dir.mkdir(exist_ok=True)
-        with open(f"../docs/benchmarks/{track_name}/index.md", "w",
-                  encoding="utf-8") as f:
+        track_slug = slugify(track_name)
+        track_dir = Path(f"../docs/benchmarks/{track_slug}")
+        track_dir.mkdir(parents=True, exist_ok=True)
+        with open(
+            f"../docs/benchmarks/{track_slug}/index.md", "w", encoding="utf-8"
+        ) as f:
 
             def print_(x):
                 return print(x, file=f, end="\n\n")
 
-
             print_(f"# {track_name}")
+            print_(
+                "Performance snapshots for this task, comparing deep-river models against strong baselines on standard river datasets."
+            )
 
             # Move the dataset from the benchmarks folder to the docs folder
             csv_name = track_name.replace(" ", "_").lower()
-            shutil.copy(f"{csv_name}.csv",
-                        f"../docs/benchmarks/{track_name}/{csv_name}.csv")
+            shutil.copy(
+                f"{csv_name}.csv",
+                f"../docs/benchmarks/{track_slug}/{csv_name}.csv",
+            )
 
-            df_path = Path(f"../docs/benchmarks/{track_name}/{csv_name}.csv")
+            df_path = Path(f"../docs/benchmarks/{track_slug}/{csv_name}.csv")
 
             df = pd.read_csv(str(df_path))
 
@@ -180,8 +210,7 @@ if __name__ == "__main__":
 
                 print_(f"### Summary")
                 df_md = (
-                    dataset_df
-                    .groupby(["model"])
+                    dataset_df.groupby(["model"])
                     .last()
                     .drop(columns=["track", "step", "dataset"])
                     .reset_index()
@@ -190,14 +219,19 @@ if __name__ == "__main__":
                 )
                 print_(df_md)
                 print_(f"### Charts")
-                print_(render_df(dataset_df=dataset_df, measures=measures,
-                                 models=unique_models, dataset=dataset,
-                                 include_plotlyjs=first_plot))
+                print_(
+                    render_df(
+                        dataset_df=dataset_df,
+                        measures=measures,
+                        models=unique_models,
+                        dataset=dataset,
+                        include_plotlyjs=first_plot,
+                    )
+                )
                 first_plot = False
 
             print_("## Datasets")
-            for dataset_name, dataset_details in track_details[
-                "Dataset"].items():
+            for dataset_name, dataset_details in track_details["Dataset"].items():
                 print_(f'???- abstract "{dataset_name}"')
                 print_(textwrap.indent(dataset_details, "    "))
                 print_("<span />")
@@ -215,7 +249,7 @@ if __name__ == "__main__":
                     watermark(
                         python=True,
                         packages="river,numpy,scikit-learn,pandas,scipy",
-                        machine=True
+                        machine=True,
                     )
                 )
             )

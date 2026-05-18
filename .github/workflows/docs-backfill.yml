@@ -1,0 +1,138 @@
+name: Backfill Documentation Versions
+
+on:
+  workflow_dispatch:
+    inputs:
+      include_dev:
+        description: "Also publish the current main branch as dev"
+        required: true
+        type: boolean
+        default: true
+      wipe_existing:
+        description: "Clear the current gh-pages contents before backfilling"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docs-publish
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Ubuntu dependencies
+        run: sudo apt-get install graphviz pandoc
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Cache uv dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-3.12-${{ hashFiles('**/uv.lock') }}
+          restore-keys: |
+            uv-${{ runner.os }}-3.12-
+            uv-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+          uv pip install \
+            "mkdocs>=1.6.0" \
+            "mkdocs-autorefs>=1.4.3" \
+            "mkdocs-awesome-pages-plugin>=2.10.1" \
+            "mkdocs-gen-files>=0.5.0" \
+            "mkdocs-jupyter>=0.25.1" \
+            "mkdocs-literate-nav>=0.6.2" \
+            "mkdocs-material>=9.6.16" \
+            "mkdocstrings[python]>=0.19.0"
+
+      - name: Prepare gh-pages worktree
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch origin gh-pages --depth=1
+            git worktree add --force -B gh-pages .publish-site origin/gh-pages
+          else
+            origin_url=$(git remote get-url origin)
+            mkdir .publish-site
+            git init .publish-site
+            git -C .publish-site remote add origin "$origin_url"
+            git -C .publish-site checkout --orphan gh-pages
+          fi
+          git -C .publish-site config user.name "github-actions[bot]"
+          git -C .publish-site config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ "${{ inputs.wipe_existing }}" == "true" ]]; then
+            find .publish-site -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          fi
+
+      - name: Backfill tagged versions
+        run: |
+          latest_tag=$(git tag --list 'v*' --sort=-version:refname | head -n 1)
+          mapfile -t tags < <(git tag --list 'v*' --sort=version:refname)
+          mkdir -p .backfill-worktrees
+          failed_tags=()
+
+          for tag in "${tags[@]}"; do
+            worktree_dir=".backfill-worktrees/${tag}"
+            git worktree add --force "$worktree_dir" "$tag"
+
+            if ! (
+              cd "$worktree_dir"
+              uv sync --all-extras || uv pip install -e .
+              MIKE_DOCS_VERSION="$tag" bash "$GITHUB_WORKSPACE/docs/scripts/build_docs.sh" "$PWD"
+              args=(
+                --source-dir "$PWD/site"
+                --target-dir "$GITHUB_WORKSPACE/.publish-site"
+                --version "$tag"
+                --title "$tag"
+              )
+              if [[ "$tag" == "$latest_tag" ]]; then
+                args+=(--alias latest --default latest)
+              fi
+              uv run python "$GITHUB_WORKSPACE/docs/scripts/publish_versioned_site.py" "${args[@]}"
+            ); then
+              failed_tags+=("$tag")
+            fi
+
+            git worktree remove --force "$worktree_dir"
+          done
+
+          if [[ "${{ inputs.include_dev }}" == "true" ]]; then
+            MIKE_DOCS_VERSION=dev bash docs/scripts/build_docs.sh
+            uv run python docs/scripts/publish_versioned_site.py \
+              --source-dir site \
+              --target-dir .publish-site \
+              --version dev \
+              --title dev
+          fi
+
+          if (( ${#failed_tags[@]} > 0 )); then
+            printf 'Failed tags: %s\n' "${failed_tags[*]}" >&2
+            exit 1
+          fi
+
+      - name: Commit gh-pages update
+        run: |
+          git -C .publish-site add -A
+          if git -C .publish-site diff --cached --quiet; then
+            echo "No documentation changes to publish."
+            exit 0
+          fi
+
+          git -C .publish-site commit -m "docs: backfill versioned site"
+          git -C .publish-site push origin gh-pages

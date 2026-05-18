@@ -1,0 +1,113 @@
+name: Documentation Site
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+concurrency:
+  group: docs-publish
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Ubuntu dependencies
+        run: sudo apt-get install graphviz pandoc
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Cache uv dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-3.12-${{ hashFiles('**/uv.lock') }}
+          restore-keys: |
+            uv-${{ runner.os }}-3.12-
+            uv-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Determine docs target
+        id: target
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            echo "title=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            echo "alias=latest" >> "$GITHUB_OUTPUT"
+            echo "default=latest" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=dev" >> "$GITHUB_OUTPUT"
+            echo "title=dev" >> "$GITHUB_OUTPUT"
+            echo "alias=" >> "$GITHUB_OUTPUT"
+            echo "default=dev" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Prepare gh-pages worktree
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch origin gh-pages --depth=1
+            git worktree add --force -B gh-pages .publish-site origin/gh-pages
+          else
+            origin_url=$(git remote get-url origin)
+            mkdir .publish-site
+            git init .publish-site
+            git -C .publish-site remote add origin "$origin_url"
+            git -C .publish-site checkout --orphan gh-pages
+          fi
+
+      - name: Configure gh-pages author
+        run: |
+          git -C .publish-site config user.name "github-actions[bot]"
+          git -C .publish-site config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Build docs
+        env:
+          MIKE_DOCS_VERSION: ${{ steps.target.outputs.version }}
+        run: bash docs/scripts/build_docs.sh
+
+      - name: Publish versioned site
+        run: |
+          args=(
+            --source-dir site
+            --target-dir .publish-site
+            --version "${{ steps.target.outputs.version }}"
+            --title "${{ steps.target.outputs.title }}"
+          )
+
+          if [[ -n "${{ steps.target.outputs.alias }}" ]]; then
+            args+=(--alias "${{ steps.target.outputs.alias }}")
+          fi
+          if [[ -n "${{ steps.target.outputs.default }}" ]]; then
+            args+=(--default "${{ steps.target.outputs.default }}")
+          fi
+
+          uv run python docs/scripts/publish_versioned_site.py "${args[@]}"
+
+      - name: Commit gh-pages update
+        run: |
+          git -C .publish-site add -A
+          if git -C .publish-site diff --cached --quiet; then
+            echo "No documentation changes to publish."
+            exit 0
+          fi
+
+          git -C .publish-site commit -m "docs: publish ${{ steps.target.outputs.version }}"
+          git -C .publish-site push origin gh-pages
