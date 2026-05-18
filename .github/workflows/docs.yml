@@ -3,7 +3,7 @@ name: Documentation Site
 on:
   push:
     branches:
-      - master
+      - main
     tags:
       - "v*"
 

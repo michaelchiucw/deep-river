@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       include_dev:
-        description: "Also publish the current master branch as dev"
+        description: "Also publish the current main branch as dev"
         required: true
         type: boolean
         default: true
