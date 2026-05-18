@@ -1,11 +1,11 @@
 <p align="center">
-  <img height="150px" src="https://raw.githubusercontent.com/online-ml/deep-river/master/docs/img/logo.png" alt="incremental dl logo">
+  <img height="150px" src="https://raw.githubusercontent.com/online-ml/deep-river/main/docs/img/logo.png" alt="incremental dl logo">
 </p>
 <p align="center">
     <img alt="PyPI" src="https://img.shields.io/pypi/v/deep-river">
     <!-- Single Coverage Badge (Shields.io) -->
     <a href="https://app.codecov.io/gh/online-ml/deep-river" >
-        <img alt="Coverage" src="https://img.shields.io/codecov/c/github/online-ml/deep-river?branch=master&logo=codecov&label=coverage" />
+        <img alt="Coverage" src="https://img.shields.io/codecov/c/github/online-ml/deep-river?branch=main&logo=codecov&label=coverage" />
     </a>
     <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/deep-river">
     <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/deep-river">
@@ -21,7 +21,7 @@
 
 ## 📚 [Documentation](https://online-ml.github.io/deep-river/)
 The [documentation](https://online-ml.github.io/deep-river/) contains an overview of all features of this repository as well as the repository's full features list. 
-In each of these, the git repo reference is listed in a section that shows [examples](https://github.com/online-ml/deep-river/blob/master/docs/examples) of the features and functionality.
+In each of these, the git repo reference is listed in a section that shows [examples](https://github.com/online-ml/deep-river/blob/main/docs/examples) of the features and functionality.
 As we are always looking for further use cases and examples, feel free to contribute to the documentation or the repository itself via a pull request
 
 ## 💈 Installation
@@ -36,7 +36,7 @@ pip install "river[deep]"
 You can install the latest development version from GitHub as so:
 
 ```shell
-pip install https://github.com/online-ml/deep-river/archive/refs/heads/master.zip
+pip install https://github.com/online-ml/deep-river/archive/refs/heads/main.zip
 ```
 
 ### Development Environment

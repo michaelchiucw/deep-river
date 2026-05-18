@@ -23,7 +23,7 @@ pip install "river[deep]"
 To use the latest development branch:
 
 ```bash
-pip install https://github.com/online-ml/deep-river/archive/refs/heads/master.zip
+pip install https://github.com/online-ml/deep-river/archive/refs/heads/main.zip
 ```
 
 ## Build your first online classifier

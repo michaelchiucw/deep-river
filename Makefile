@@ -29,7 +29,7 @@ livedoc: check-uv
 	uv run zensical serve
 
 rebase:
-	git fetch && git rebase origin/master
+	git fetch && git rebase origin/main
 
 clean:
 	 rm -rf .venv/

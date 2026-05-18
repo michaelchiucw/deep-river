@@ -10,11 +10,11 @@ Of course, you're welcome to propose and contribute new ideas. In this case, we 
 
 The typical workflow for contributing to River is:
 
-1. Fork the `master` branch from the [GitHub repository](https://github.com/online-ml/deep-river/).
+1. Fork the `main` branch from the [GitHub repository](https://github.com/online-ml/deep-river/).
 2. Clone your fork locally.
 3. Commit changes.
 4. Push the changes to your fork.
-5. Send a pull request from your fork back to the original `master` branch.
+5. Send a pull request from your fork back to the original `main` branch.
 
 ## Local setup
 
@@ -150,7 +150,7 @@ make execute-notebooks
 
 ## Making a new release
 
-1. Checkout `master`
+1. Checkout `main`
 2. Run `make execute-notebooks` just to be safe
 3. Run the [benchmarks](benchmarks)
 4. Bump the version in `deep_river/__version__.py`
@@ -173,11 +173,11 @@ git push origin "v$DEEP_RIVER_VERSION"
 
 ## Versioned docs
 
-The documentation site publishes one entry per git tag and keeps `dev` up to date from `master`.
+The documentation site publishes one entry per git tag and keeps `dev` up to date from `main`.
 
 - Tagged releases are published under the exact tag name, for example `v0.3.2`.
 - The newest stable release is also copied to the `latest` alias.
 - The site root redirects to `latest`.
-- `dev` is rebuilt from `master` on every docs deployment.
+- `dev` is rebuilt from `main` on every docs deployment.
 
 If you need to rebuild all historical documentation versions, run the manual [Backfill Documentation Versions](https://github.com/online-ml/deep-river/actions/workflows/docs-backfill.yml) workflow.
