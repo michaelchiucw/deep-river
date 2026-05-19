@@ -249,7 +249,7 @@ To acknowledge the use of the `DeepRiver` library in your research, please refer
 ## 🏫 Affiliations
 
 <p align="center">
-    <img src="https://upload.wikimedia.org/wikipedia/de/thumb/4/44/Fzi_logo.svg/1200px-Fzi_logo.svg.png?raw=true" alt="FZI Logo" height="200"/>
+    <img src="https://upload.wikimedia.org/wikipedia/de/4/44/Fzi_logo.svg" alt="FZI Logo" height="200"/>
 </p>
 
 <p align="center">
